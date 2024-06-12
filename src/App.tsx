@@ -13,7 +13,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   fragColor = vec4(uv, 0.5 + 0.5 * sin(iTime), 1.0);
 }`;
 
-const shaders = atom('shaders', [defaultShader] as string[])
+const webcamShader = `
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord / iResolution.xy;
+
+    // Sample the texture from iChannel0
+    vec4 texColor = texture(iChannel0, uv);
+
+    // Output the color
+    fragColor = vec4(texColor.rgb, 1.0);
+}
+`
+
+const shaders = atom('shaders', [webcamShader] as string[])
 const MAX_AHEAD = 5;
 
 const App: React.FC = () => {
@@ -21,7 +34,7 @@ const App: React.FC = () => {
   const [bpm, setBpm] = useState<number>(135);
 
   const addNewShader = () => {
-    shaders.update(s => [...s, defaultShader])
+    shaders.update(s => [...s, webcamShader])
   };
 
   const shaderValue = useValue(shaders)
@@ -29,11 +42,14 @@ const App: React.FC = () => {
   const forkShader = useCallback(async () => {
     const lastShader = shaders.value[shaders.value.length - 1];
     // const input = prompt();
-    const userPrompt = `Modify this shader to make it look more like ${caption}: glsl\`\`\`${lastShader}\`\`\` Make sure it's still interesting enough to accompany music.`
+    const userPrompt = `Modify this shader based on the prompt:
+      <prompt>${caption}</prompt>
+
+      glsl\`\`\`${lastShader}\`\`\``
     const systemPrompt = `
       you are a webgl creative coding expert
 
-      you are adept in reading the sourcecode of a ShaderToy shader and explaining how it works, considering interesting modifications and applying them to the code. You may not use any iChannels, only iTime, iResolution, and iMouse.
+      you are adept in reading the sourcecode of a ShaderToy shader and explaining how it works, considering interesting modifications and applying them to the code. You may only use iChannel0, iTime, iResolution, and iMouse.
 
       when the code becomes too complex, factor out functions or remove functionality to keep the shader tight and focused. you are in charge.
 

@@ -1,5 +1,8 @@
 import React, { useRef, useEffect } from "react";
+import { atom } from "signia";
+import { useValue } from "signia-react";
 import * as THREE from "three";
+import { videoTexture } from "./webcam";
 
 interface ShaderToyProps {
   fragmentShader: string;
@@ -9,6 +12,7 @@ interface ShaderToyProps {
 const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const webcam = useValue(videoTexture);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -33,13 +37,17 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
         ),
       },
       iMouse: { value: new THREE.Vector2() },
-    };
+      iChannel0: { value: webcam },
+    }
+
+    console.log('Uniforms:', uniforms)
 
     const material = new THREE.ShaderMaterial({
       fragmentShader: `
         uniform float iTrueTime;
         uniform vec3 iResolution;
         uniform vec2 iMouse;
+        uniform sampler2D iChannel0;
 
         float iTime;
         float alt,lt,atr,tr;
@@ -72,6 +80,11 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
 
     const animate = () => {
       uniforms.iTrueTime.value = performance.now() / 1000.0;
+      // if (videoTexture.current && uniformsRef.current.iChannel0.value !== videoTexture.current) {
+      //   uniformsRef.current.iChannel0.value = videoTexture.current;
+      //   material.needsUpdate = true;
+      //   material.uniformsNeedUpdate = true;
+      // }
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
@@ -105,7 +118,7 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
         container.removeChild(renderer.domElement);
       }
     };
-  }, [fragmentShader, bpm]);
+  }, [fragmentShader, bpm, webcam]);
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
