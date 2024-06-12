@@ -1,0 +1,3 @@
+- tools to change sections of the code, or return + apply patches instead of full code
+- cross two shaders, shaderbreeder
+- dynamically evolving VJ software

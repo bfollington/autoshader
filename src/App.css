@@ -1,0 +1,57 @@
+#root {
+    width: 100vw;
+    height: 100vh;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.add-button {
+    margin-bottom: 20px;
+}
+
+.shader-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.shader-item {
+    position: relative;
+    width: 100%;
+    padding-top: 75%;
+}
+
+.shader-item textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    height: 25%;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    resize: none;
+    font-size: 4px;
+}
+
+.shader-item .remove-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.shader-item div {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    width: 100%;
+    height: calc(100%);
+}
