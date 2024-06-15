@@ -1,30 +1,22 @@
-# React + TypeScript + Vite
+# autoshader
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Generate, fork and blend ShaderToy compatible shaders using webcam, microphone and mouse input.
 
-Currently, two official plugins are available:
+BYO OpenAI key. You will be prompted to enter it when you launch the app, it's stored in localstorage.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+`npm install`
+`npm dev`
 
-## Expanding the ESLint configuration
+## Permissions
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Sometimes Chrome will block the microphone and webcam permissions. You can enable them by clicking the lock icon in the address bar and changing the permissions to allow all.
 
-- Configure the top-level `parserOptions` property like this:
+## Usage
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+You can copy any single-buffer ShaderToy example into the tiny code panel on each shader and it should work. You can copy them back out to ShaderToy too, or save a session to a local .json file.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+You can enter or Tap BPM to set the tempo of the music visualiser.
+
+Add: adds a basic webcam shader.
+Generate: applies the current prompt to the shader and generate up to 4 new shaders.
+Blend: combines the last two shaders in the buffer.
