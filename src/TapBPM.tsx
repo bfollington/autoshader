@@ -1,13 +1,26 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface TapBPMProps {
   onBPMChange: (bpm: number) => void;
 }
 
 const TapBPM: React.FC<TapBPMProps> = ({ onBPMChange }) => {
-  const [bpm, setBpm] = useState<number | null>(null);
+  const [bpm, setBpm] = useState<number>(120);
   const [tapTimes, setTapTimes] = useState<number[]>([]);
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [dotPulse, setDotPulse] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (bpm !== null) {
+      const interval = 60000 / bpm;
+      const pulseInterval = setInterval(() => {
+        setDotPulse(true);
+        setTimeout(() => setDotPulse(false), interval / 2);
+      }, interval);
+
+      return () => clearInterval(pulseInterval);
+    }
+  }, [bpm]);
 
   const handleTap = () => {
     const currentTime = Date.now();
@@ -42,20 +55,31 @@ const TapBPM: React.FC<TapBPMProps> = ({ onBPMChange }) => {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: "20px" }}>
+    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+      <input
+        type="number"
+        style={{ width: "50px" }}
+        value={bpm !== null ? bpm : ''}
+        onChange={handleInputChange}
+        placeholder="BPM"
+      />
       <button
         onClick={handleTap}
-        style={{ marginBottom: "10px", cursor: "pointer", }}
+        style={{ cursor: "pointer" }}
       >
         Tap BPM
       </button>
-      <input
-        type="number"
-        value={bpm !== null ? bpm : ''}
-        onChange={handleInputChange}
-        placeholder="Enter BPM"
-        style={{}}
-      />
+
+      <div
+        style={{
+          width: "10px",
+          height: "10px",
+          borderRadius: "50%",
+          background: dotPulse ? "red" : "gray",
+          marginLeft: "10px",
+          transition: "background 0.1s"
+        }}
+      ></div>
     </div>
   );
 };

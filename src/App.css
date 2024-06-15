@@ -8,10 +8,7 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 20px;
-}
-
-.add-button {
-    margin-bottom: 20px;
+    position: relative;
 }
 
 .shader-grid {
@@ -54,4 +51,36 @@
     left: 0;
     width: 100%;
     height: calc(100%);
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    /* height: 48px; */
+}
+
+.toolbar>* {
+    display: block;
+}
+
+.caption {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    height: 64px;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.caption input {
+    margin: 1rem auto;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 1.5rem;
 }

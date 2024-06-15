@@ -3,6 +3,7 @@ import { atom } from "signia";
 import { useValue } from "signia-react";
 import * as THREE from "three";
 import { videoTexture } from "./webcam";
+import { fftTexture } from "./microphone";
 
 interface ShaderToyProps {
   fragmentShader: string;
@@ -13,6 +14,7 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const webcam = useValue(videoTexture);
+  const microphone = useValue(fftTexture);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -29,6 +31,7 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
 
     const uniforms = {
       iTrueTime: { value: 0 },
+      iBpm: { value: bpm },
       iResolution: {
         value: new THREE.Vector3(
           container.clientWidth,
@@ -38,22 +41,22 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
       },
       iMouse: { value: new THREE.Vector2() },
       iChannel0: { value: webcam },
+      iChannel1: { value: microphone },
     }
-
-    console.log('Uniforms:', uniforms)
 
     const material = new THREE.ShaderMaterial({
       fragmentShader: `
         uniform float iTrueTime;
+        uniform float iBpm;
         uniform vec3 iResolution;
         uniform vec2 iMouse;
         uniform sampler2D iChannel0;
+        uniform sampler2D iChannel1;
 
         float iTime;
         float alt,lt,atr,tr;
         int bt;
         vec2 asp,asp2;
-        float bpm = ${bpm}.0;
         void settime(float t)
         {
             alt = lt = t;
@@ -63,12 +66,13 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
             lt = tr + float(bt);
         }
 
-          ${fragmentShader}
+        ${fragmentShader}
 
         void main() {
-          settime(iTrueTime*bpm/60.);
+          settime(iTrueTime*iBpm/60.);
           iTime = lt;
           mainImage(gl_FragColor, gl_FragCoord.xy);
+          gl_FragColor.a = 1.0;
         }
       `,
       uniforms,
@@ -80,11 +84,6 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
 
     const animate = () => {
       uniforms.iTrueTime.value = performance.now() / 1000.0;
-      // if (videoTexture.current && uniformsRef.current.iChannel0.value !== videoTexture.current) {
-      //   uniformsRef.current.iChannel0.value = videoTexture.current;
-      //   material.needsUpdate = true;
-      //   material.uniformsNeedUpdate = true;
-      // }
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
@@ -102,7 +101,6 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
         const rect = container.getBoundingClientRect();
         const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         const mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        console.log(mouseX, mouseY);
         uniforms.iMouse.value.set(mouseX, mouseY);
       }
     };
@@ -118,7 +116,7 @@ const ShaderToy: React.FC<ShaderToyProps> = ({ fragmentShader, bpm }) => {
         container.removeChild(renderer.domElement);
       }
     };
-  }, [fragmentShader, bpm, webcam]);
+  }, [fragmentShader, bpm, webcam, microphone]);
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
