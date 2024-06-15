@@ -1,5 +1,7 @@
 # autoshader
 
+<img width="1624" alt="Screenshot 2024-06-15 at 11 46 21 AM" src="https://github.com/bfollington/autoshader/assets/5009316/3e3e4ce5-b6e9-4e08-826b-14c2099d61a3">
+
 Generate, fork and blend ShaderToy compatible shaders using webcam, microphone and mouse input.
 
 BYO OpenAI key. You will be prompted to enter it when you launch the app, it's stored in localstorage.
