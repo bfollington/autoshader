@@ -67,7 +67,7 @@ export async function processUserInput(
       model,
       tools: toolSpec,
       tool_choice: "auto",
-      temperature: 0.5,
+      temperature: 1,
     });
 
     if (response.choices[0].finish_reason === "stop") {

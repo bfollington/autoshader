@@ -102,6 +102,8 @@ const App: React.FC = () => {
     const userPrompt = `Consider how to modify the following ShaderToy shader based on the user prompt:
       <prompt>${caption}</prompt>
 
+      Be imaginative, these will be visuals to accompany music at a live event. Interpret the prompt in a way that is visually interesting and engaging without resorting to cheap tricks like rainbows.
+
       glsl\`\`\`${lastShader}\`\`\`
 
       First, plan your approach conceptually (recording your thinking using tools) and then write the code.
@@ -148,6 +150,8 @@ const App: React.FC = () => {
     // const input = prompt();
     const userPrompt = `Consider how to blend the following two ShaderToy shaders based on the user prompt:
       <prompt>${caption}</prompt>
+
+      Do not simply overlay one on the other, try to mix and match functions, effects, variables, and other elements to create a new, interesting, and creative shader.
 
       # Shader A
       glsl\`\`\`${lastShaderA}\`\`\`
