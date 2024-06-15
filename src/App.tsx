@@ -119,6 +119,10 @@ const App: React.FC = () => {
         "think": (v) => {
           console.log('think', v)
           return "Thought recorded. Pleasure jamming with you."
+        },
+        "plan": (v) => {
+          console.log('plan', v)
+          return "Thought recorded. Pleasure jamming with you."
         }
       }),
     ])
@@ -171,6 +175,10 @@ const App: React.FC = () => {
       processUserInput(userPrompt, systemPrompt, {
         "think": (v) => {
           console.log('think', v)
+          return "Thought recorded. Pleasure jamming with you."
+        },
+        "plan": (v) => {
+          console.log('plan', v)
           return "Thought recorded. Pleasure jamming with you."
         }
       }),
