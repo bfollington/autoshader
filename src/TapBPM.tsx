@@ -1,18 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
+import { atom } from "signia";
+import { useValue } from "signia-react";
+
+export const bpm = atom('bpm', 120)
 
 interface TapBPMProps {
-  onBPMChange: (bpm: number) => void;
 }
 
-const TapBPM: React.FC<TapBPMProps> = ({ onBPMChange }) => {
-  const [bpm, setBpm] = useState<number>(120);
+const TapBPM: React.FC<TapBPMProps> = () => {
   const [tapTimes, setTapTimes] = useState<number[]>([]);
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [dotPulse, setDotPulse] = useState<boolean>(false);
 
+  const currentBpm = useValue(bpm)
+
   useEffect(() => {
-    if (bpm !== null) {
-      const interval = 60000 / bpm;
+    if (currentBpm !== null) {
+      const interval = 60000 / currentBpm;
       const pulseInterval = setInterval(() => {
         setDotPulse(true);
         setTimeout(() => setDotPulse(false), interval / 2);
@@ -20,7 +24,7 @@ const TapBPM: React.FC<TapBPMProps> = ({ onBPMChange }) => {
 
       return () => clearInterval(pulseInterval);
     }
-  }, [bpm]);
+  }, [currentBpm]);
 
   const handleTap = () => {
     const currentTime = Date.now();
@@ -34,8 +38,7 @@ const TapBPM: React.FC<TapBPMProps> = ({ onBPMChange }) => {
       const calculatedBpm = Math.round(60000 / averageInterval);
 
       setTapTimes(newTapTimes);
-      setBpm(calculatedBpm);
-      onBPMChange(calculatedBpm);
+      bpm.set(calculatedBpm);
 
       if (tapTimeoutRef.current) {
         clearTimeout(tapTimeoutRef.current);
@@ -49,8 +52,7 @@ const TapBPM: React.FC<TapBPMProps> = ({ onBPMChange }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(event.target.value);
     if (!isNaN(value) && value > 0) {
-      setBpm(value);
-      onBPMChange(value);
+      bpm.set(value);
     }
   };
 
@@ -59,7 +61,7 @@ const TapBPM: React.FC<TapBPMProps> = ({ onBPMChange }) => {
       <input
         type="number"
         style={{ width: "50px" }}
-        value={bpm !== null ? bpm : ''}
+        value={currentBpm !== null ? currentBpm : ''}
         onChange={handleInputChange}
         placeholder="BPM"
       />

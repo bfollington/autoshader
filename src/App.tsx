@@ -2,9 +2,10 @@ import React, { useCallback, useState } from 'react';
 import ShaderToy from './ShaderToy';
 import './App.css';
 import { grabGlsl, processUserInput } from './llm';
-import TapBPM from './TapBPM';
+import { default as TapBPM, bpm } from './TapBPM';
 import { atom } from 'signia';
-import { useAtom, useValue } from 'signia-react';
+import { useValue } from 'signia-react';
+import './midi'
 import SaveShadersButton from './SaveShadersButton';
 import LoadShadersButton from './LoadShadersButton';
 
@@ -86,9 +87,23 @@ const systemPrompt = `Write creative, beautiful, tasteful and terse Shadertoy sh
      when presented with shader code you respond with a modified version of the code that is interesting and creative with no other output. you provide detailed comments in the code documenting your intentions.
 `
 
+async function askClaude(prompt: string, system: string) {
+  const body = { "action": "create", "message": prompt, "system": system, "activeTools": [] }
+  const result = await fetch('http://localhost:8000/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
+
+  return await result.json() as { output: string[] }
+}
+
 const App: React.FC = () => {
   const [caption, setCaption] = useState<string>('an infinite dream, ever changing and subtly evolving');
-  const [bpm, setBpm] = useState<number>(135);
+
+  const currentBpm = useValue(bpm)
 
   const addNewShader = () => {
     shaders.update(s => [...s, webcamShader])
@@ -114,25 +129,13 @@ const App: React.FC = () => {
     //   "think": (v) => console.log('think', v)
     // });
 
-    const results = await Promise.all([
-      processUserInput(userPrompt, systemPrompt, {
-        "think": (v) => {
-          console.log('think', v)
-          return "Thought recorded. Pleasure jamming with you."
-        },
-        "plan": (v) => {
-          console.log('plan', v)
-          return "Thought recorded. Pleasure jamming with you."
-        }
-      }),
-    ])
+    const results = [await askClaude(userPrompt, systemPrompt)]
     console.log(results)
-
 
     const added: string[] = []
     for (const result of results) {
-      if (result && result.choices[0].message.content) {
-        const glsl = grabGlsl(result.choices[0].message.content);
+      if (result && result.output[0]) {
+        const glsl = grabGlsl(result.output[0]);
         if (glsl) {
           added.push(glsl)
         } else {
@@ -205,10 +208,6 @@ const App: React.FC = () => {
     setCaption(e.target.value);
   }
 
-  const bpmChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBpm(parseInt(e.target.value));
-  }
-
   const removeShader = (index: number) => {
     const updatedShaders = [...shaders.value];
     updatedShaders.splice(index, 1);
@@ -219,7 +218,7 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <div className="toolbar">
-        <TapBPM onBPMChange={setBpm} />
+        <TapBPM />
         <button className="add-button" onClick={addNewShader}>Add</button>
         <button className="fork-button" onClick={forkShader}>Generate</button>
         <button className="blend-button" onClick={mixShaders}>Blend</button>
@@ -238,7 +237,7 @@ const App: React.FC = () => {
               }}
             />
             <button className='remove-button' onClick={() => removeShader(index)}>Remove</button>
-            <ShaderToy fragmentShader={shader} bpm={bpm} />
+            <ShaderToy fragmentShader={shader} bpm={currentBpm} />
           </div>
         ))}
       </div>
